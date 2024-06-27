@@ -6,6 +6,11 @@ import random
 sumoBinary = sumolib.checkBinary('sumo-gui')  # Use 'sumo' if you don't need the GUI
 traci.start([sumoBinary, "-c", "./osm.sumocfg"])
 
+# Define Route
+start_edge = "BL_Start"  # Replace with your start edge ID
+start_edge_2 = "B_Start"
+stop_edge = "TR_End"    # Replace with your stop edge ID
+
 # Define the incident parameters
 incident_time = 500  # Time step when the incident occurs
 incident_duration = 9000  # Duration of the incident
@@ -35,27 +40,47 @@ def reroute_vehicles():
             # Handle any exceptions (e.g., if the vehicle can't be rerouted)
             pass
 
+def random_incident(edge_list, edge_number):
+    random_list = random.sample(edge_list, edge_number)
+    for incident_edge in random_list:
+        traci.edge.setDisallowed(incident_edge, ["passenger"])
+    return random_list
+
+def clear_incident(incident_list):
+    for incident_edge in incident_list:
+            traci.edge.setAllowed(incident_edge , ["passenger"])
+
+route_edges = traci.simulation.findRoute(start_edge, stop_edge).edges
+
+route_edges_2 = traci.simulation.findRoute(start_edge_2, stop_edge).edges
+
+# Add the calculated route to TraCI
+traci.route.add('r_0', route_edges)
+traci.route.add('r_1', route_edges_2)
+
+
+for i in range(100):
+    vehicle_id = "v" + str(i)
+    if i % 2 == 0 :
+        traci.vehicle.add(vehicle_id, "r_0")
+    else :
+        traci.vehicle.add(vehicle_id, "r_1")
+
 while traci.simulation.getMinExpectedNumber() > 0:
     traci.simulationStep()
+    
+    
     current_time = traci.simulation.getTime()
 
     # Introduce the incident
     if current_time == incident_time:
-        
-        selected_edge_list = random.sample(incident_edge_list, incident_number)
-        
-        for incident_edge in selected_edge_list:
-            traci.edge.setDisallowed(incident_edge, ["passenger"])
-        
+        incident_edge_list = random_incident(incident_edge_list, incident_number)
         # Reroute vehicles immediately after the incident
         reroute_vehicles()
 
     # Clear the incident after the duration
     if current_time == incident_time + incident_duration:
-        
-        for incident_edge in selected_edge_list:
-            traci.edge.setAllowed(incident_edge , ["passenger"])
-        
+        clear_incident(incident_edge_list)
         # Optionally, reroute vehicles again to normalize traffic
         reroute_vehicles()
 

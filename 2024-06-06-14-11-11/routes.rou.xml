@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-06-27 14:02:06 by Eclipse SUMO duarouter Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="osm.net.xml"/>
+        <route-files value="trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="routes.rou.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="veh_passenger" vClass="passenger" />
+    <route id="r_0"
+        edges="BL_Start 26694547#0-AddedOffRampEdge 268366803#0 268366803#1 966474541 273924628#0 273924628#1 273924628#2 273924628#3 273924628#6 977465924#1 977465924#2 977465924#3 977465924#4 977465924#5 964931602#1 174762072#0 174762072#1 465069434#1 465069434#4 465069434#7 465069434#10 465069434#13 30175871#5 772134678#1 772134677#1 772134677#2 772134677#3 772134677#4 772134677#5 772134677#6 772134677#7 476097674#0 476097674#1 476097674#4 296062481#1 296062481#2 TR_End" />
+    <route id="r_1"
+        edges="B_Start 26694547#0-AddedOffRampEdge 268366803#0 268366803#1 966474541 273924628#0 273924628#1 273924628#2 273924628#3 273924628#6 977465924#1 977465924#2 977465924#3 977465924#4 977465924#5 964931602#1 174762072#0 174762072#1 465069434#1 465069434#4 465069434#7 465069434#10 465069434#13 30175871#5 772134678#1 772134677#1 772134677#2 772134677#3 772134677#4 772134677#5 772134677#6 772134677#7 476097674#0 476097674#1 476097674#4 296062481#1 296062481#2 TR_End" />
+
+</routes>
