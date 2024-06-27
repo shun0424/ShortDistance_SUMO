@@ -1,5 +1,6 @@
 import traci
 import sumolib
+import random
 
 # Start the SUMO simulation
 sumoBinary = sumolib.checkBinary('sumo-gui')  # Use 'sumo' if you don't need the GUI
@@ -8,7 +9,9 @@ traci.start([sumoBinary, "-c", "./osm.sumocfg"])
 # Define the incident parameters
 incident_time = 500  # Time step when the incident occurs
 incident_duration = 9000  # Duration of the incident
-incident_edge = '977465924#1'  # Edge where the incident occurs
+incident_number = 50
+incident_edge_list = traci.edge.getIDList()
+selected_edge_list = []
 incident_lane = 0  # Lane where the incident occurs
 
 def reroute_vehicles():
@@ -20,10 +23,14 @@ def reroute_vehicles():
             v_route = traci.vehicle.getRoute(vehicle_id)
             print(vehicle_id)
             print("Before Re_route : " + str(v_route))
+
             traci.vehicle.rerouteTraveltime(vehicle_id)
+            
             v_route = traci.vehicle.getRoute(vehicle_id)
             print("After Re_route : " + str(v_route))
+            
             print("------------------------------------------------------------------")
+        
         except traci.TraCIException:
             # Handle any exceptions (e.g., if the vehicle can't be rerouted)
             pass
@@ -34,13 +41,21 @@ while traci.simulation.getMinExpectedNumber() > 0:
 
     # Introduce the incident
     if current_time == incident_time:
-        traci.edge.setDisallowed(incident_edge, ["passenger"])
+        
+        selected_edge_list = random.sample(incident_edge_list, incident_number)
+        
+        for incident_edge in selected_edge_list:
+            traci.edge.setDisallowed(incident_edge, ["passenger"])
+        
         # Reroute vehicles immediately after the incident
         reroute_vehicles()
 
     # Clear the incident after the duration
     if current_time == incident_time + incident_duration:
-        traci.edge.setAllowed(incident_edge , ["passenger"])
+        
+        for incident_edge in selected_edge_list:
+            traci.edge.setAllowed(incident_edge , ["passenger"])
+        
         # Optionally, reroute vehicles again to normalize traffic
         reroute_vehicles()
 
