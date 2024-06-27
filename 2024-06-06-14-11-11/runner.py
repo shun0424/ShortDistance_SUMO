@@ -17,7 +17,13 @@ def reroute_vehicles():
     for vehicle_id in vehicle_ids:
         try:
             # Find an alternative route for the vehicle
+            v_route = traci.vehicle.getRoute(vehicle_id)
+            print(vehicle_id)
+            print("Before Re_route : " + str(v_route))
             traci.vehicle.rerouteTraveltime(vehicle_id)
+            v_route = traci.vehicle.getRoute(vehicle_id)
+            print("After Re_route : " + str(v_route))
+            print("------------------------------------------------------------------")
         except traci.TraCIException:
             # Handle any exceptions (e.g., if the vehicle can't be rerouted)
             pass
