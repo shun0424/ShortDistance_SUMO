@@ -14,11 +14,11 @@ stop_edge = "TR_End"    # Replace with your stop edge ID
 
 # Define the incident parameters
 incident_time = 500  # Time step when the incident occurs
-incident_duration = 500  # Duration of the incident
+incident_duration = 1000  # Duration of the incident
 incident_number = 150
 incident_edge_list = traci.edge.getIDList()
 selected_edge_list = []
-vehicle_num = 100
+vehicle_num = 200
 
 def reroute_vehicles():
     # Get the list of all vehicles in the simulation
@@ -46,11 +46,13 @@ def random_incident(edge_list, edge_number):
     # print(random_list)
     for incident_edge in random_list:
         traci.edge.setDisallowed(incident_edge, ["passenger"])
+    traci.edge.setDisallowed("incident_Lane",["passenger"])
     return random_list
 
 def clear_incident(incident_list):
     for incident_edge in incident_list:
             traci.edge.setAllowed(incident_edge , ["passenger"])
+    traci.edge.setAllowed("incident_Lane",["passenger"])
     selected_edge_list = []
 
 route_edges = traci.simulation.findRoute(start_edge, stop_edge).edges
