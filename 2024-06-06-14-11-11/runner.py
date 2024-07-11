@@ -18,7 +18,7 @@ incident_duration = 500  # Duration of the incident
 incident_number = 150
 incident_edge_list = traci.edge.getIDList()
 selected_edge_list = []
-incident_lane = 0  # Lane where the incident occurs
+vehicle_num = 100
 
 def reroute_vehicles():
     # Get the list of all vehicles in the simulation
@@ -27,7 +27,7 @@ def reroute_vehicles():
         try:
             # Find an alternative route for the vehicle
             v_route = traci.vehicle.getRoute(vehicle_id)
-            print(vehicle_id)
+            print(vehicle_id +" " + str(traci.vehicle.getDeparture(vehicle_id)))
             print("Before Re_route : " + str(v_route))
 
             traci.vehicle.rerouteTraveltime(vehicle_id)
@@ -51,6 +51,7 @@ def random_incident(edge_list, edge_number):
 def clear_incident(incident_list):
     for incident_edge in incident_list:
             traci.edge.setAllowed(incident_edge , ["passenger"])
+    selected_edge_list = []
 
 route_edges = traci.simulation.findRoute(start_edge, stop_edge).edges
 
@@ -61,10 +62,11 @@ traci.route.add('r_0', route_edges)
 traci.route.add('r_1', route_edges_2)
 
 
-for i in range(100):
+for i in range(vehicle_num):
     vehicle_id = "v" + str(i)
     if i % 2 == 0 :
         traci.vehicle.add(vehicle_id, "r_0")
+        traci.vehicle.setRoutingMode(vehID=vehicle_id, routingMode = 1)
     else :
         traci.vehicle.add(vehicle_id, "r_1")
 
@@ -76,13 +78,13 @@ while traci.simulation.getMinExpectedNumber() > 0:
 
     # Introduce the incident
     if current_time == incident_time:
-        incident_edge_list = random_incident(incident_edge_list, incident_number)
+        selected_edge_list = random_incident(incident_edge_list, incident_number)
         # Reroute vehicles immediately after the incident
         reroute_vehicles()
 
     # Clear the incident after the duration
     if current_time == incident_time + incident_duration:
-        clear_incident(incident_edge_list)
+        clear_incident(selected_edge_list)
         # Optionally, reroute vehicles again to normalize traffic
         reroute_vehicles()
         incident_time = current_time + incident_duration
