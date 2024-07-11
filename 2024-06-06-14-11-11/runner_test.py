@@ -12,7 +12,7 @@ start_edge_2 = "B_Start"
 stop_edge = "TR_End"    # Replace with your stop edge ID
 
 # Define the incident parameters
-incident_time = 0  # Time step when the incident occurs
+incident_time = 500  # Time step when the incident occurs
 incident_duration = 500  # Duration of the incident
 incident_number = 50
 incident_edge_list = traci.edge.getIDList()
@@ -74,7 +74,7 @@ while traci.simulation.getMinExpectedNumber() > 0:
     current_time = traci.simulation.getTime()
 
     # Introduce the incident
-    if current_time % 1 == incident_time:
+    if current_time % 500 == incident_time:
         incident_edge_list = random_incident(incident_edge_list, incident_number)
         # Reroute vehicles immediately after the incident
         reroute_vehicles()
