@@ -1,5 +1,6 @@
 import traci
 import sumolib
+import numpy as np
 import random
 
 # Start the SUMO simulation
@@ -14,7 +15,7 @@ stop_edge = "TR_End"    # Replace with your stop edge ID
 # Define the incident parameters
 incident_time = 500  # Time step when the incident occurs
 incident_duration = 500  # Duration of the incident
-incident_number = 50
+incident_number = 150
 incident_edge_list = traci.edge.getIDList()
 selected_edge_list = []
 incident_lane = 0  # Lane where the incident occurs
@@ -34,15 +35,15 @@ def reroute_vehicles():
             v_route = traci.vehicle.getRoute(vehicle_id)
             print("After Re_route : " + str(v_route))
             
-            print("------------------------------------------------------------------")
+            print("------------------------------------   ------------------------------")
         
         except traci.TraCIException:
             # Handle any exceptions (e.g., if the vehicle can't be rerouted)
             pass
 
 def random_incident(edge_list, edge_number):
-    random.seed()
-    random_list = random.sample(edge_list, edge_number)
+    random_list = np.random.choice(edge_list, size=edge_number)
+    # print(random_list)
     for incident_edge in random_list:
         traci.edge.setDisallowed(incident_edge, ["passenger"])
     return random_list
