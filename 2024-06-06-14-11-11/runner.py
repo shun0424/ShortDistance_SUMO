@@ -13,6 +13,7 @@ start_edge_2 = "B_Start"
 stop_edge = "TR_End"    # Replace with your stop edge ID
 incident_lane = "incident_lane"
 side_lane = "side_lane"
+change_mode_lane = 'change_mode_lane'
 
 # Define the incident parameters
 incident_time = 500  # Time step when the incident occurs
@@ -23,9 +24,10 @@ selected_edge_list = []
 incident_lane_output = []
 side_lane_output = []
 vehicle_num = 100
-routingMode = 0
+routingMode = 1
 
-isWrite = False
+# Change to False if u want to disable CSV writter
+isWrite = True
 
 def reroute_vehicles():
     # Get the list of all vehicles in the simulation
@@ -100,7 +102,7 @@ while traci.simulation.getMinExpectedNumber() > 0:
     current_time = traci.simulation.getTime()
     
     incident_lane_output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber(incident_lane)}) 
-    side_lane_output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber(side_lane)})
+    side_lane_output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber(change_mode_lane)})
 
     # Introduce the incident
     if current_time == incident_time:
@@ -117,14 +119,14 @@ while traci.simulation.getMinExpectedNumber() > 0:
 
 fields = ['time','numberOfCar']
 
-print('start')
+
 
 if isWrite == True:
-    create_CSV('incident_edge.csv', fields, incident_lane_output)
-    create_CSV('side_edge.csv', fields, side_lane_output)
+    print('start')
+    create_CSV('incident_edge_change.csv', fields, incident_lane_output)
+    create_CSV('side_edge_change.csv', fields, side_lane_output)
+    print('end')
 
-
-print('end')
 
 traci.close()
 
