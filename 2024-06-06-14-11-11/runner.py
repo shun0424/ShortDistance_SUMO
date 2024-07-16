@@ -1,7 +1,7 @@
 import traci
 import sumolib
 import numpy as np
-import random
+import csv
 
 # Start the SUMO simulation
 sumoBinary = sumolib.checkBinary('sumo-gui')  # Use 'sumo' if you don't need the GUI
@@ -18,7 +18,9 @@ incident_duration = 1000  # Duration of the incident
 incident_number = 150
 incident_edge_list = traci.edge.getIDList()
 selected_edge_list = []
-vehicle_num = 200
+output = []
+vehicle_num = 100
+routingMode = 0
 
 def reroute_vehicles():
     # Get the list of all vehicles in the simulation
@@ -26,16 +28,16 @@ def reroute_vehicles():
     for vehicle_id in vehicle_ids:
         try:
             # Find an alternative route for the vehicle
-            v_route = traci.vehicle.getRoute(vehicle_id)
-            print(vehicle_id +" " + str(traci.vehicle.getDeparture(vehicle_id)))
-            print("Before Re_route : " + str(v_route))
+            # v_route = traci.vehicle.getRoute(vehicle_id)
+            # print(vehicle_id +" " + str(traci.vehicle.getDeparture(vehicle_id)))
+            # print("Before Re_route : " + str(v_route))
 
             traci.vehicle.rerouteTraveltime(vehicle_id)
             
-            v_route = traci.vehicle.getRoute(vehicle_id)
-            print("After Re_route : " + str(v_route))
+            # v_route = traci.vehicle.getRoute(vehicle_id)
+            # print("After Re_route : " + str(v_route))
             
-            print("------------------------------------   ------------------------------")
+            # print("------------------------------------   ------------------------------")
         
         except traci.TraCIException:
             # Handle any exceptions (e.g., if the vehicle can't be rerouted)
@@ -68,15 +70,19 @@ for i in range(vehicle_num):
     vehicle_id = "v" + str(i)
     if i % 2 == 0 :
         traci.vehicle.add(vehicle_id, "r_0")
-        traci.vehicle.setRoutingMode(vehID=vehicle_id, routingMode = 1)
+        traci.vehicle.setRoutingMode(vehID=vehicle_id, routingMode = routingMode)
     else :
         traci.vehicle.add(vehicle_id, "r_1")
+        
+        traci.vehicle.setRoutingMode(vehID=vehicle_id, routingMode = routingMode)
 
 while traci.simulation.getMinExpectedNumber() > 0:
     
     traci.simulationStep()
         
     current_time = traci.simulation.getTime()
+    
+    output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber("incident_Lane")}) 
 
     # Introduce the incident
     if current_time == incident_time:
@@ -94,3 +100,17 @@ while traci.simulation.getMinExpectedNumber() > 0:
 
 
 traci.close()
+
+fields = ['time','numberOfCar']
+filename = 'output1.csv'
+with open(filename, 'w') as csvfile:
+    print('start')
+    # creating a csv dict writer object
+    writer = csv.DictWriter(csvfile, fieldnames=fields)
+
+    # writing headers (field names)
+    writer.writeheader()
+
+    # writing data rows
+    writer.writerows(output)
+print('end')
