@@ -11,6 +11,8 @@ traci.start([sumoBinary, "-c", "./osm.sumocfg"])
 start_edge = "BL_Start"  # Replace with your start edge ID
 start_edge_2 = "B_Start"
 stop_edge = "TR_End"    # Replace with your stop edge ID
+incident_lane = "incident_lane"
+side_lane = "side_lane"
 
 # Define the incident parameters
 incident_time = 500  # Time step when the incident occurs
@@ -18,9 +20,12 @@ incident_duration = 1000  # Duration of the incident
 incident_number = 150
 incident_edge_list = traci.edge.getIDList()
 selected_edge_list = []
-output = []
+incident_lane_output = []
+side_lane_output = []
 vehicle_num = 100
 routingMode = 0
+
+isWrite = False
 
 def reroute_vehicles():
     # Get the list of all vehicles in the simulation
@@ -48,14 +53,26 @@ def random_incident(edge_list, edge_number):
     # print(random_list)
     for incident_edge in random_list:
         traci.edge.setDisallowed(incident_edge, ["passenger"])
-    traci.edge.setDisallowed("incident_Lane",["passenger"])
+    traci.edge.setDisallowed(incident_lane,["passenger"])
     return random_list
 
 def clear_incident(incident_list):
     for incident_edge in incident_list:
             traci.edge.setAllowed(incident_edge , ["passenger"])
-    traci.edge.setAllowed("incident_Lane",["passenger"])
+    traci.edge.setAllowed(incident_lane,["passenger"])
     selected_edge_list = []
+
+def create_CSV(filename, fields, data):
+    with open(filename, 'w') as csvfile:
+
+        # creating a csv dict writer object
+        writer = csv.DictWriter(csvfile, fieldnames=fields)
+
+        # writing headers (field names)
+        writer.writeheader()
+
+        # writing data rows
+        writer.writerows(data)
 
 route_edges = traci.simulation.findRoute(start_edge, stop_edge).edges
 
@@ -82,7 +99,8 @@ while traci.simulation.getMinExpectedNumber() > 0:
         
     current_time = traci.simulation.getTime()
     
-    output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber("incident_Lane")}) 
+    incident_lane_output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber(incident_lane)}) 
+    side_lane_output.append({'time':current_time,'numberOfCar':traci.edge.getLastStepVehicleNumber(side_lane)})
 
     # Introduce the incident
     if current_time == incident_time:
@@ -97,20 +115,16 @@ while traci.simulation.getMinExpectedNumber() > 0:
         reroute_vehicles()
         incident_time = current_time + incident_duration
 
+fields = ['time','numberOfCar']
 
+print('start')
+
+if isWrite == True:
+    create_CSV('incident_edge.csv', fields, incident_lane_output)
+    create_CSV('side_edge.csv', fields, side_lane_output)
+
+
+print('end')
 
 traci.close()
 
-fields = ['time','numberOfCar']
-filename = 'output1.csv'
-with open(filename, 'w') as csvfile:
-    print('start')
-    # creating a csv dict writer object
-    writer = csv.DictWriter(csvfile, fieldnames=fields)
-
-    # writing headers (field names)
-    writer.writeheader()
-
-    # writing data rows
-    writer.writerows(output)
-print('end')
