@@ -27,7 +27,7 @@ vehicle_num = 100
 routingMode = 1
 
 # Change to False if u want to disable CSV writter
-isWrite = True
+isWrite = False
 
 def reroute_vehicles():
     # Get the list of all vehicles in the simulation
@@ -122,9 +122,15 @@ fields = ['time','numberOfCar']
 
 
 if isWrite == True:
+
     print('start')
-    create_CSV('incident_edge_change.csv', fields, incident_lane_output)
-    create_CSV('side_edge_change.csv', fields, side_lane_output)
+    if change_mode_lane == 0:
+        create_CSV('incident_edge.csv', fields, incident_lane_output)
+        create_CSV('side_edge.csv', fields, side_lane_output)
+
+    elif change_mode_lane == 1:
+        create_CSV('incident_edge_change.csv', fields, incident_lane_output)
+        create_CSV('side_edge_change.csv', fields, side_lane_output)
     print('end')
 
 
